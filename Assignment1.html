@@ -55,13 +55,16 @@ function generateMaze(size)
 
 function solveMaze()
 {
+    document.getElementById("result").innerHTML = "Solving."
 	//alert("Your work starts here!");
-    while (count < 500) {
+    if (count < 500) {
         if (isBesideFinal(y, x)) {
             console.log("reached")
-            break;
+            document.getElementById("result").innerHTML = "Puzzle solved."
+            //break;
+            return true;
         }
-        //setTimeout(function () { takeStep() }, 30);
+        setTimeout(function () { solveMaze() }, 200);
         takeStep()
         
         console.log(x,y,"--")
@@ -106,15 +109,15 @@ function solveMaze()
                 y += 1;
             }
             //check up
-            else if ((y - 1) < 0) {
-                if ((states[y - 1][x] == cellStates.blank) && (y > 0)) {
+            
+                else if ((states[y - 1][x] == cellStates.blank)) {
                     console.log("hit1", y, x)
                     states[y][x] = cellStates.north;
                     setCell(y, x, states[y][x]);
                     stack.push([y, x])
                     y -= 1;
                 }
-            }
+            
             //check left
             else if (states[y][x - 1] == cellStates.blank) {
                 console.log("hit1", y, x)
@@ -144,5 +147,6 @@ function solveMaze()
     </p>
     <canvas id="cv" width="400" height="400"></canvas>
     <input type="button" value="Solve it!" onclick="solveMaze();" />
+    <h4 id="result"></h4>
 </body>
 </html>
