@@ -1,115 +1,161 @@
 ﻿
 <html>
 <head>
-    <script lang="javascript">var cellStates = Object.freeze( {hurdle: 1, blank: 2, backtracked: 3, north: 4, south: 5, east: 6, west: 7, start: 8, finish: 9 } );
+    <script lang="javascript">
+        var cellStates = Object.freeze({ hurdle: 1, blank: 2, backtracked: 3, north: 4, south: 5, east: 6, west: 7, start: 8, finish: 9 });
+        var stateText = {
+            [cellStates.hurdle]: "", [cellStates.start]: "S", [cellStates.finish]: "F",
+            [cellStates.blank]: "", [cellStates.backtrack]: "B", [cellStates.north]: "↑", [cellStates.south]: "↓",
+            [cellStates.east]: "→", [cellStates.west]: "←"
+        };
 
-var stateText = { [cellStates.hurdle] : "",  [cellStates.start] : "S", [cellStates.finish]: "F",
-	[cellStates.blank] : "", [cellStates.backtrack]: "B", [cellStates.north]: "↑", [cellStates.south]: "↓",
-    [cellStates.east]: "→", [cellStates.west]: "←" };
-
-function setCell(row, col, cellState) {
-	var x = col * 20;
-  	var y = row * 20;
-  	var cv = document.getElementById('cv');
-  	var ctx = cv.getContext('2d');
-  	ctx.fillStyle = "blue";
-  	ctx.fillRect(x, y, 20, 20);
-  	x++;
-  	y++;
-  	ctx.fillStyle = (cellState == cellStates.hurdle ? "black" : "white");
-  	ctx.fillRect(x, y, 18, 18);
-    if( cellState != cellStates.hurdle ) {
-    	ctx.font = "bold 15px Arial";
-        ctx.fillStyle = "red";
-        ctx.fillText( stateText[cellState], x+3, y+14 );
-    }
-}
+        function setCell(row, col, cellState) {
+            var x = col * 20;
+            var y = row * 20;
+            var cv = document.getElementById('cv');
+            var ctx = cv.getContext('2d');
+            ctx.fillStyle = "blue";
+            ctx.fillRect(x, y, 20, 20);
+            x++;
+            y++;
+            ctx.fillStyle = (cellState == cellStates.hurdle ? "black" : "white");
+            ctx.fillRect(x, y, 18, 18);
+            if (cellState != cellStates.hurdle) {
+                ctx.font = "bold 15px Arial";
+                ctx.fillStyle = "red";
+                ctx.fillText(stateText[cellState], x + 3, y + 14);
+            }
+        }
         var states;
         var x = 0;
         var y = 0;
         var count = 0;
-        var stack = []
+        var stack = [];
+        var hasStarted = false;
 
-function generateMaze(size)
-{
-	states = new Array(size);
-    console.log("states", states)
 
-	for( rowIndex = 0; rowIndex < size; ++rowIndex ) {
-    	states[rowIndex] = new Array(size);
+        function generateMaze(size) {
+            states = new Array(size);
+            console.log("states", states)
 
-  		for( colIndex = 0; colIndex < size; ++colIndex ) {
-   			var rd = Math.floor(Math.random() * 5);
+            for (rowIndex = 0; rowIndex < size; ++rowIndex) {
+                states[rowIndex] = new Array(size);
 
-      		states[rowIndex][colIndex] = (rowIndex + colIndex == 0 ? cellStates.start :
-            	( rowIndex == size - 1 && colIndex == size - 1 ? cellStates.finish :
-                ( rd == 0 ? cellStates.hurdle : cellStates.blank )));
+                for (colIndex = 0; colIndex < size; ++colIndex) {
+                    var rd = Math.floor(Math.random() * 3);
 
-	        setCell(rowIndex, colIndex, states[rowIndex][colIndex]);
+                    states[rowIndex][colIndex] = (rowIndex + colIndex == 0 ? cellStates.start :
+                        (rowIndex == size - 1 && colIndex == size - 1 ? cellStates.finish :
+                            (rd == 0 ? cellStates.hurdle : cellStates.blank)));
+
+                    setCell(rowIndex, colIndex, states[rowIndex][colIndex]);
+                }
+            }
+
+            console.log("states", states)
         }
-    }
 
-    console.log("states", states)
-    solveMaze()
-}
+        function solveMaze() {
+            if ((x == 0) && (y == 0) && (hasStarted == true)) {
+                console.log("not solvable")
+                document.getElementById("result").innerHTML = "Not solvable."
+                return true;
+            }
+            document.getElementById("result").innerHTML = "Solving."
+            //alert("Your work starts here!");
+            if (count < 500) {
+                if (isBesideFinal(y, x)) {
+                    console.log("reached")
+                    document.getElementById("result").innerHTML = "Puzzle solved."
+                    //break;
+                    return true;
+                }
+                setTimeout(function () { solveMaze() }, 2);
+                takeStep()
 
-function solveMaze()
-{
-    document.getElementById("result").innerHTML = "Solving."
-	//alert("Your work starts here!");
-    if (count < 500) {
-        if (isBesideFinal(y, x)) {
-            console.log("reached")
-            document.getElementById("result").innerHTML = "Puzzle solved."
-            //break;
-            return true;
+                console.log(x, y, "--")
+            }
+
+            count += 1;
+            hasStarted = true;
         }
-        setTimeout(function () { solveMaze() }, 200);
-        takeStep()
-        
-        console.log(x,y,"--")
-      }
 
-      count+=1;
-    }
-
-    function isBesideFinal(y, x) {
-        if ((y == 19) && (x == 18)) {
-            states[y][x] = cellStates.east;
-            setCell(y, x, states[y][x]);
-            return true;
-        }
-        else if ((y == 18) && (x == 19)) {
-            states[y][x] = cellStates.south;
-            setCell(y, x, states[y][x]);
-            return true;
-        }
-        return false;
-    }
-
-        function takeStep() {
-            console.log("y, x", y, x)
-            // check if reached
-            
-            //check right
-            if (states[y][x + 1] == cellStates.blank) {
-                console.log("hit1", y, x)
+        function isBesideFinal(y, x) {
+            if ((y == 19) && (x == 18)) {
                 states[y][x] = cellStates.east;
                 setCell(y, x, states[y][x]);
-                stack.push([y, x])
-                x += 1;
+                return true;
             }
-            //check down
-
-            else if (states[y + 1][x] == cellStates.blank) {
-                console.log("hit1", y, x)
+            else if ((y == 18) && (x == 19)) {
                 states[y][x] = cellStates.south;
                 setCell(y, x, states[y][x]);
-                stack.push([y, x])
-                y += 1;
+                return true;
             }
-            //check up
-            
+            return false;
+        }
+
+        function takeStep() {
+
+            if (y == 0) {
+                console.log("y, x", y, x)
+                // check if reached
+
+                //check right
+                if (states[y][x + 1] == cellStates.blank) {
+                    console.log("hit1", y, x)
+                    states[y][x] = cellStates.east;
+                    setCell(y, x, states[y][x]);
+                    stack.push([y, x])
+                    x += 1;
+                }
+                //check down
+
+                else if (states[y + 1][x] == cellStates.blank) {
+                    console.log("hit1", y, x)
+                    states[y][x] = cellStates.south;
+                    setCell(y, x, states[y][x]);
+                    stack.push([y, x])
+                    y += 1;
+                }
+
+                //check left
+                else if (states[y][x - 1] == cellStates.blank) {
+                    console.log("hit1", y, x)
+                    states[y][x] = cellStates.west;
+                    setCell(y, x, states[y][x]);
+                    stack.push([y, x])
+                    x -= 1;
+                }
+                else {
+                    console.log("no way")
+                    states[y][x] = cellStates.backtrack;
+                    setCell(y, x, states[y][x]);
+                    //stack.push([y,x])
+                    console.log("old", y, x)
+                    y = stack[stack.length - 1][0]
+                    x = stack[stack.length - 1][1]
+                    stack.pop()
+                    console.log("new", y, x)
+
+                }
+
+            }
+
+            else if (y == 19) {
+                console.log("y, x", y, x)
+                // check if reached
+
+                //check right
+                if (states[y][x + 1] == cellStates.blank) {
+                    console.log("hit1", y, x)
+                    states[y][x] = cellStates.east;
+                    setCell(y, x, states[y][x]);
+                    stack.push([y, x])
+                    x += 1;
+                }
+              
+                //check up
+
                 else if ((states[y - 1][x] == cellStates.blank)) {
                     console.log("hit1", y, x)
                     states[y][x] = cellStates.north;
@@ -117,29 +163,130 @@ function solveMaze()
                     stack.push([y, x])
                     y -= 1;
                 }
-            
-            //check left
-            else if (states[y][x - 1] == cellStates.blank) {
-                console.log("hit1", y, x)
-                states[y][x] = cellStates.west;
-                setCell(y, x, states[y][x]);
-                stack.push([y, x])
-                x -= 1;
+
+                //check left
+                else if (states[y][x - 1] == cellStates.blank) {
+                    console.log("hit1", y, x)
+                    states[y][x] = cellStates.west;
+                    setCell(y, x, states[y][x]);
+                    stack.push([y, x])
+                    x -= 1;
+                }
+                else {
+                    console.log("no way")
+                    states[y][x] = cellStates.backtrack;
+                    setCell(y, x, states[y][x]);
+                    //stack.push([y,x])
+                    console.log("old", y, x)
+                    y = stack[stack.length - 1][0]
+                    x = stack[stack.length - 1][1]
+                    stack.pop()
+                    console.log("new", y, x)
+
+                }
+
+            }
+
+            else if (x == 0) {
+                console.log("y, x", y, x)
+                // check if reached
+
+                //check right
+                if (states[y][x + 1] == cellStates.blank) {
+                    console.log("hit1", y, x)
+                    states[y][x] = cellStates.east;
+                    setCell(y, x, states[y][x]);
+                    stack.push([y, x])
+                    x += 1;
+                }
+                //check down
+
+                else if (states[y + 1][x] == cellStates.blank) {
+                    console.log("hit1", y, x)
+                    states[y][x] = cellStates.south;
+                    setCell(y, x, states[y][x]);
+                    stack.push([y, x])
+                    y += 1;
+                }
+                //check up
+
+                else if ((states[y - 1][x] == cellStates.blank)) {
+                    console.log("hit1", y, x)
+                    states[y][x] = cellStates.north;
+                    setCell(y, x, states[y][x]);
+                    stack.push([y, x])
+                    y -= 1;
+                }
+
+                else {
+                    console.log("no way")
+                    states[y][x] = cellStates.backtrack;
+                    setCell(y, x, states[y][x]);
+                    //stack.push([y,x])
+                    console.log("old", y, x)
+                    y = stack[stack.length - 1][0]
+                    x = stack[stack.length - 1][1]
+                    stack.pop()
+                    console.log("new", y, x)
+
+                }
+
             }
             else {
-                console.log("no way")
-                states[y][x] = cellStates.backtrack;
-                setCell(y, x, states[y][x]);
-                //stack.push([y,x])
-                console.log("old", y, x)
-                y = stack[stack.length - 1][0]
-                x = stack[stack.length - 1][1]
-                stack.pop()
-                console.log("new", y, x)
+                console.log("y, x", y, x)
+                // check if reached
 
+                //check right
+                if (states[y][x + 1] == cellStates.blank) {
+                    console.log("hit1", y, x)
+                    states[y][x] = cellStates.east;
+                    setCell(y, x, states[y][x]);
+                    stack.push([y, x])
+                    x += 1;
+                }
+                //check down
+
+                else if (states[y + 1][x] == cellStates.blank) {
+                    console.log("hit1", y, x)
+                    states[y][x] = cellStates.south;
+                    setCell(y, x, states[y][x]);
+                    stack.push([y, x])
+                    y += 1;
+                }
+                //check up
+
+                else if ((states[y - 1][x] == cellStates.blank)) {
+                    console.log("hit1", y, x)
+                    states[y][x] = cellStates.north;
+                    setCell(y, x, states[y][x]);
+                    stack.push([y, x])
+                    y -= 1;
+                }
+
+                //check left
+                else if (states[y][x - 1] == cellStates.blank) {
+                    console.log("hit1", y, x)
+                    states[y][x] = cellStates.west;
+                    setCell(y, x, states[y][x]);
+                    stack.push([y, x])
+                    x -= 1;
+                }
+                else {
+                    console.log("no way")
+                    states[y][x] = cellStates.backtrack;
+                    setCell(y, x, states[y][x]);
+                    //stack.push([y,x])
+                    console.log("old", y, x)
+                    y = stack[stack.length - 1][0]
+                    x = stack[stack.length - 1][1]
+                    stack.pop()
+                    console.log("new", y, x)
+
+                }
+
+            }
         }
-
-}</script>
+    </script>
 </head>
 <body onload="generateMaze(20);">
     <p>
@@ -147,6 +294,8 @@ function solveMaze()
     </p>
     <canvas id="cv" width="400" height="400"></canvas>
     <input type="button" value="Solve it!" onclick="solveMaze();" />
-    <h4 id="result"></h4>
+    <h2 id="result"></h2>
 </body>
 </html>
+
+
