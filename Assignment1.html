@@ -36,7 +36,6 @@
 
         function generateMaze(size) {
             states = new Array(size);
-            console.log("states", states)
 
             for (rowIndex = 0; rowIndex < size; ++rowIndex) {
                 states[rowIndex] = new Array(size);
@@ -52,28 +51,24 @@
                 }
             }
 
-            console.log("states", states)
         }
 
         function solveMaze() {
-            if ((x == 0) && (y == 0) && (hasStarted == true)) {
-                console.log("not solvable")
+            if ((x == 0) && (y == 0) && (hasStarted == true) && (count > 5)) {
                 document.getElementById("result").innerHTML = "Not solvable."
                 return true;
             }
             document.getElementById("result").innerHTML = "Solving."
             //alert("Your work starts here!");
-            if (count < 500) {
+            if (count < 1000) {
                 if (isBesideFinal(y, x)) {
-                    console.log("reached")
                     document.getElementById("result").innerHTML = "Puzzle solved."
                     //break;
                     return true;
                 }
-                setTimeout(function () { solveMaze() }, 2);
+                setTimeout(function () { solveMaze() }, 100);
                 takeStep()
 
-                console.log(x, y, "--")
             }
 
             count += 1;
@@ -97,12 +92,10 @@
         function takeStep() {
 
             if (y == 0) {
-                console.log("y, x", y, x)
                 // check if reached
 
                 //check right
                 if (states[y][x + 1] == cellStates.blank) {
-                    console.log("hit1", y, x)
                     states[y][x] = cellStates.east;
                     setCell(y, x, states[y][x]);
                     stack.push([y, x])
@@ -111,7 +104,6 @@
                 //check down
 
                 else if (states[y + 1][x] == cellStates.blank) {
-                    console.log("hit1", y, x)
                     states[y][x] = cellStates.south;
                     setCell(y, x, states[y][x]);
                     stack.push([y, x])
@@ -120,34 +112,28 @@
 
                 //check left
                 else if (states[y][x - 1] == cellStates.blank) {
-                    console.log("hit1", y, x)
                     states[y][x] = cellStates.west;
                     setCell(y, x, states[y][x]);
                     stack.push([y, x])
                     x -= 1;
                 }
                 else {
-                    console.log("no way")
                     states[y][x] = cellStates.backtrack;
                     setCell(y, x, states[y][x]);
                     //stack.push([y,x])
-                    console.log("old", y, x)
                     y = stack[stack.length - 1][0]
                     x = stack[stack.length - 1][1]
                     stack.pop()
-                    console.log("new", y, x)
 
                 }
 
             }
 
             else if (y == 19) {
-                console.log("y, x", y, x)
                 // check if reached
 
                 //check right
                 if (states[y][x + 1] == cellStates.blank) {
-                    console.log("hit1", y, x)
                     states[y][x] = cellStates.east;
                     setCell(y, x, states[y][x]);
                     stack.push([y, x])
@@ -157,7 +143,6 @@
                 //check up
 
                 else if ((states[y - 1][x] == cellStates.blank)) {
-                    console.log("hit1", y, x)
                     states[y][x] = cellStates.north;
                     setCell(y, x, states[y][x]);
                     stack.push([y, x])
@@ -166,34 +151,28 @@
 
                 //check left
                 else if (states[y][x - 1] == cellStates.blank) {
-                    console.log("hit1", y, x)
                     states[y][x] = cellStates.west;
                     setCell(y, x, states[y][x]);
                     stack.push([y, x])
                     x -= 1;
                 }
                 else {
-                    console.log("no way")
                     states[y][x] = cellStates.backtrack;
                     setCell(y, x, states[y][x]);
                     //stack.push([y,x])
-                    console.log("old", y, x)
                     y = stack[stack.length - 1][0]
                     x = stack[stack.length - 1][1]
                     stack.pop()
-                    console.log("new", y, x)
 
                 }
 
             }
 
             else if (x == 0) {
-                console.log("y, x", y, x)
                 // check if reached
 
                 //check right
                 if (states[y][x + 1] == cellStates.blank) {
-                    console.log("hit1", y, x)
                     states[y][x] = cellStates.east;
                     setCell(y, x, states[y][x]);
                     stack.push([y, x])
@@ -202,7 +181,6 @@
                 //check down
 
                 else if (states[y + 1][x] == cellStates.blank) {
-                    console.log("hit1", y, x)
                     states[y][x] = cellStates.south;
                     setCell(y, x, states[y][x]);
                     stack.push([y, x])
@@ -211,7 +189,6 @@
                 //check up
 
                 else if ((states[y - 1][x] == cellStates.blank)) {
-                    console.log("hit1", y, x)
                     states[y][x] = cellStates.north;
                     setCell(y, x, states[y][x]);
                     stack.push([y, x])
@@ -219,26 +196,21 @@
                 }
 
                 else {
-                    console.log("no way")
                     states[y][x] = cellStates.backtrack;
                     setCell(y, x, states[y][x]);
                     //stack.push([y,x])
-                    console.log("old", y, x)
                     y = stack[stack.length - 1][0]
                     x = stack[stack.length - 1][1]
                     stack.pop()
-                    console.log("new", y, x)
 
                 }
 
             }
             else {
-                console.log("y, x", y, x)
                 // check if reached
 
                 //check right
                 if (states[y][x + 1] == cellStates.blank) {
-                    console.log("hit1", y, x)
                     states[y][x] = cellStates.east;
                     setCell(y, x, states[y][x]);
                     stack.push([y, x])
@@ -247,7 +219,6 @@
                 //check down
 
                 else if (states[y + 1][x] == cellStates.blank) {
-                    console.log("hit1", y, x)
                     states[y][x] = cellStates.south;
                     setCell(y, x, states[y][x]);
                     stack.push([y, x])
@@ -256,7 +227,6 @@
                 //check up
 
                 else if ((states[y - 1][x] == cellStates.blank)) {
-                    console.log("hit1", y, x)
                     states[y][x] = cellStates.north;
                     setCell(y, x, states[y][x]);
                     stack.push([y, x])
@@ -265,22 +235,18 @@
 
                 //check left
                 else if (states[y][x - 1] == cellStates.blank) {
-                    console.log("hit1", y, x)
                     states[y][x] = cellStates.west;
                     setCell(y, x, states[y][x]);
                     stack.push([y, x])
                     x -= 1;
                 }
                 else {
-                    console.log("no way")
                     states[y][x] = cellStates.backtrack;
                     setCell(y, x, states[y][x]);
                     //stack.push([y,x])
-                    console.log("old", y, x)
                     y = stack[stack.length - 1][0]
                     x = stack[stack.length - 1][1]
                     stack.pop()
-                    console.log("new", y, x)
 
                 }
 
