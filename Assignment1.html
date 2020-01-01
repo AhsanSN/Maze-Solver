@@ -2,6 +2,8 @@
 <html>
 <head>
     <script lang="javascript">
+        var gridSize = 20;
+        var speed = 80;
         var cellStates = Object.freeze({ hurdle: 1, blank: 2, backtracked: 3, north: 4, south: 5, east: 6, west: 7, start: 8, finish: 9 });
         var stateText = {
             [cellStates.hurdle]: "", [cellStates.start]: "S", [cellStates.finish]: "F",
@@ -66,7 +68,7 @@
                     //break;
                     return true;
                 }
-                setTimeout(function () { solveMaze() }, 100);
+                setTimeout(function () { solveMaze() }, speed);
                 takeStep()
 
             }
@@ -76,12 +78,12 @@
         }
 
         function isBesideFinal(y, x) {
-            if ((y == 19) && (x == 18)) {
+            if ((y == (gridSize-1)) && (x == 18)) {
                 states[y][x] = cellStates.east;
                 setCell(y, x, states[y][x]);
                 return true;
             }
-            else if ((y == 18) && (x == 19)) {
+            else if ((y == 18) && (x == (gridSize-1))) {
                 states[y][x] = cellStates.south;
                 setCell(y, x, states[y][x]);
                 return true;
@@ -129,7 +131,7 @@
 
             }
 
-            else if (y == 19) {
+            else if (y == (gridSize-1)) {
                 // check if reached
 
                 //check right
@@ -249,12 +251,11 @@
                     stack.pop()
 
                 }
-
             }
         }
     </script>
 </head>
-<body onload="generateMaze(20);">
+<body onload="generateMaze(gridSize);">
     <p>
         Maze Generator &amp; Solver
     </p>
